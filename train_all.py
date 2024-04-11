@@ -6,25 +6,18 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 matplotlib.use("Agg")
-
-# from pathlib import Path
-# import sys
-# path_root = Path(__file__).parents[2]
-# sys.path.append(str(path_root))
-
 from embedtrack.train.run_training_pipeline import (
     DataConfig,
     ModelConfig,
     TrainConfig,
     run_pipeline,
 )
-# from ..train.run_training_pipeline import DataConfig, ModelConfig, TrainConfig, run_pipeline
 import os
 from pathlib import Path
 
 # data configs
-FILE_PATH = Path(__file__)
-PROJECT_PATH = os.path.join(*FILE_PATH.parts[:-3])
+
+PROJECT_PATH = "/home/MinaHossain/EmbedTrack"
 
 RAW_DATA_PATH = os.path.join(PROJECT_PATH, "ctc_raw_data/train")
 DATA_PATH_DEST = os.path.join(PROJECT_PATH, "data")
@@ -43,10 +36,11 @@ DATA_SETS = [
     # "BF-C2DL-HSC",
     # "Fluo-N2DL-HeLa",
     # "BF-C2DL-MuSC",
-    # "DIC-C2DH-HeLa",
+    "DIC-C2DH-HeLa",
     # "PhC-C2DH-U373",
-    "Cell-Data-M"
+    # "Cell-Data-M"
 ]
+
 N_EPOCHS = 15
 # Adam optimizer; normalize images; OneCycle LR sheduler; N epochs
 MODEL_NAME = "adam_norm_onecycle_" + str(N_EPOCHS)

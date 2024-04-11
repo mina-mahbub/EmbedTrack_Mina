@@ -107,8 +107,8 @@ def inference(raw_data_path, model_path, config_file, batch_size=32):
         n_classes=n_classes,
     )
     model = init_model(model_dict, project_config)
-    if torch.cuda.device_count() > 1:
-        model = torch.nn.DataParallel(model)
+    # if torch.cuda.device_count() > 1:
+    #     model = torch.nn.DataParallel(model)
 
     model = model.to(device)
     model.eval()

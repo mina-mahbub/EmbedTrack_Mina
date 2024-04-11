@@ -5,7 +5,7 @@ Modified work Copyright 2022 Katharina Löffler, Karlsruhe Institute of Technolo
 Modifications: processing of image pairs; augmentation of offset maps; Blur,Clahe, min max percentile augmentation
 """
 import collections
-
+from collections.abc import Iterable
 import albumentations
 import numpy as np
 import torch
@@ -114,7 +114,7 @@ def normalize(img, lower=0.01, upper=99.99):
 class ToTensorFromNumpy(object):
     def __init__(self, keys=[], type="float"):
 
-        if isinstance(type, collections.Iterable):
+        if isinstance(type, Iterable):
             assert len(keys) == len(type)
 
         self.keys = keys
@@ -124,7 +124,7 @@ class ToTensorFromNumpy(object):
 
         for idx, k in enumerate(self.keys):
             t = self.type
-            if isinstance(t, collections.Iterable):
+            if isinstance(t, Iterable):
                 t = t[idx]
             if k in sample:
                 k_name = k.split("_")[0]

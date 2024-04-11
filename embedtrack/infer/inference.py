@@ -18,7 +18,8 @@ from embedtrack.utils.utils import get_indices_pandas
 from pathlib import Path
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = 'cuda:0'
 
 
 class InferenceDataSet(Dataset):
@@ -607,7 +608,7 @@ def infer_sequence(model, data_config, model_config, config, cluster, min_mask_s
             os.makedirs(d_path)
 
     img_files = {
-        int(re.findall("\d+", file)[0]): os.path.join(config["image_dir"], file)
+        int(re.findall(r"\d+", file)[0]): os.path.join(config["image_dir"], file)
         for file in os.listdir(config["image_dir"])
     }
     time_points = sorted(img_files.keys(), reverse=True)
@@ -898,7 +899,7 @@ def remove_single_frame_tracks(tracking_dir):
         if not file.endswith("tif"):
             continue
         image = tifffile.imread(os.path.join(tracking_dir, file))
-        time_point = int(re.findall("\d+", file)[0])
+        time_point = int(re.findall(r"\d+", file)[0])
         if time_point in tracks_by_time.groups:
             tracks_to_remove = tracks_by_time.get_group(time_point)
             for track_id in tracks_to_remove["track_id"].values:
@@ -974,7 +975,7 @@ def rename_to_ctc_format(data_dir, res_dir):
         os.makedirs(res_dir)
     for file in os.listdir(data_dir):
         if file.endswith("tif"):
-            time_step = re.findall("\d+", file)[0]
+            time_step = re.findall(r"\d+", file)[0]
             new_file_name = "mask" + time_step + ".tif"
         elif file.endswith("txt"):
             new_file_name = "res_track.txt"
@@ -1092,7 +1093,7 @@ def edit_tracks_with_missing_masks(tracking_dir):
     )
     # track_id : [t_start(gap), gap_length]
     mask_files = {
-        int(re.findall("\d+", file_name)[0]): os.path.join(tracking_dir, file_name)
+        int(re.findall(r"\d+", file_name)[0]): os.path.join(tracking_dir, file_name)
         for file_name in os.listdir(tracking_dir)
         if file_name.endswith(".tif")
     }
@@ -1114,15 +1115,23 @@ def edit_tracks_with_missing_masks(tracking_dir):
                 mask_img = tifffile.imread(mask_files[t])
                 mask_img[mask_img == track_id] = max_track_id
                 tifffile.imwrite(mask_files[t], mask_img)
-            lineage_data = lineage_data.append(
-                {
-                    "m_id": max_track_id,
-                    "t_s": t_start,
-                    "t_e": t_end,
-                    "pred": tracklet_parent,
-                },
-                ignore_index=True,
-            )
+            # lineage_data = lineage_data.append(
+            #     {
+            #         "m_id": max_track_id,
+            #         "t_s": t_start,
+            #         "t_e": t_end,
+            #         "pred": tracklet_parent,
+            #     },
+            #     ignore_index=True,
+            # )
+            new_row = pd.DataFrame([{
+                "m_id": max_track_id,
+                "t_s": t_start,
+                "t_e": t_end,
+                "pred": tracklet_parent,
+            }])
+
+            lineage_data = pd.concat([lineage_data, new_row], ignore_index=True)
             tracklet_parent = max_track_id
 
     lineage_data.to_csv(

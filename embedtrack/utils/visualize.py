@@ -108,7 +108,7 @@ class VisualizeTraining:
         self.rescale = True
 
     def set_ax_off(self, ax):
-        if isinstance(ax, np.object):
+        if isinstance(ax, object):   # np.object to object
             for sub_ax in ax.flatten():
                 sub_ax.axis("off")
         else:

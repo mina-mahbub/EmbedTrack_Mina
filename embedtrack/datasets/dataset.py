@@ -212,10 +212,10 @@ class TwoDimensionalDataset(Dataset):
         if len(self.center_image_list) != 0:
             center_image_curr = tifffile.imread(
                 self.center_image_list[index_curr]
-            ).astype(np.bool)
+            ).astype(bool)
             center_image_prev = tifffile.imread(
                 self.center_image_list[index_prev]
-            ).astype(np.bool)
+            ).astype(bool)
             center_image_curr = self.convert_yx_to_cyx(
                 center_image_curr, key="center_image"
             )  # CYX
