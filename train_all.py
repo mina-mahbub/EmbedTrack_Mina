@@ -24,7 +24,7 @@ DATA_PATH_DEST = os.path.join(PROJECT_PATH, "data")
 MODEL_PATH = os.path.join(PROJECT_PATH, "models")
 
 USE_SILVER_TRUTH = True
-TRAIN_VAL_SEQUNCES = ["01", "02"]
+TRAIN_VAL_SEQUNCES = ["01"]
 TRAIN_VAL_SPLIT = 0.1
 
 
@@ -36,9 +36,9 @@ DATA_SETS = [
     # "BF-C2DL-HSC",
     # "Fluo-N2DL-HeLa",
     # "BF-C2DL-MuSC",
-    "DIC-C2DH-HeLa",
+    # "DIC-C2DH-HeLa",
     # "PhC-C2DH-U373",
-    # "Cell-Data-M"
+    "Cell-Data-M"
 ]
 
 N_EPOCHS = 15
