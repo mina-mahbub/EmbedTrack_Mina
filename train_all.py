@@ -17,7 +17,7 @@ from pathlib import Path
 
 # data configs
 
-PROJECT_PATH = "/home/MinaHossain/EmbedTrack"
+PROJECT_PATH = "/home/MinaHossain/EmbedTrack_Mina"
 
 RAW_DATA_PATH = os.path.join(PROJECT_PATH, "ctc_raw_data/train")
 DATA_PATH_DEST = os.path.join(PROJECT_PATH, "data")
