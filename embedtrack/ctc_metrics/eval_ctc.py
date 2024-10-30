@@ -64,10 +64,10 @@ def calc_tra_score(result_dir, gt_dir, get_aogm_results=True):
 
     # ctc executable expects time points in file names to have a fixed length
     n_files = len([f for f in os.listdir(gt_dir / "TRA") if f.endswith("tif")])
-    if n_files < 1000:
-        n_digits = 3
-    else:
-        n_digits = 4
+    # if n_files < 1000:
+    #     n_digits = 3
+    # else:
+    n_digits = 4
 
     for f in os.listdir(default_res_dir):
         if f.startswith("mask"):
@@ -83,10 +83,10 @@ def calc_tra_score(result_dir, gt_dir, get_aogm_results=True):
     result, _ = output.communicate()
 
     tra_measure = re.findall(r"\d\.\d*", result.decode("utf-8"))
-    print(result)
+    print(1, result)
 
     # undo moving of result folder
-    print(result_dir)
+    print(2, result_dir)
     if result_dir.as_posix() != default_res_dir.as_posix():
         shutil.move(default_res_dir.as_posix(), result_dir.as_posix())
         if temp_dir is not None:
@@ -146,10 +146,10 @@ def calc_ctc_scores(result_dir, gt_dir):
             if f.endswith("tif")
         ]
     )
-    if n_files < 1000:
-        n_digits = 3
-    else:
-        n_digits = 4
+    # if n_files < 1000:
+    #     n_digits = 3
+    # else:
+    n_digits = 4
 
     for f in os.listdir(default_res_dir):
         if f.startswith("mask"):
@@ -202,7 +202,9 @@ def extract_tra_score_from_log(file):
 
 def extract_metric_score_from_log(file, metric_name):
     """Extracts a ctc metric score from log file."""
-    pattern = re.compile(f"{metric_name} measure: (\d+\.\d*).*")
+    # pattern = re.compile(f"{metric_name} measure: (\d+\.\d*).*")     #old code
+    pattern = re.compile(rf"{metric_name} measure: (\d+\.\d*).*")
+
 
     with open(file, "r") as f:
         for line in f.readlines():
@@ -219,7 +221,9 @@ def extract_aogm_info(tra_log_file):
     Returns: dict containing tracking errors overall count and over time
 
     """
-    pattern = re.compile("\[*T=\d+")
+    # pattern = re.compile("\[*T=\d+")     # old code
+    pattern = re.compile(r"\[*T=\d+")
+
     with open(tra_log_file, "r") as f:
         lines = f.readlines()
 
@@ -269,3 +273,25 @@ def extract_aogm_info(tra_log_file):
         aogm_measure = {"counts": error_counts, "t": errors_over_t}
 
     return aogm_measure
+
+
+
+
+
+
+result_dir = Path("/home/MinaHossain/EmbedTrack/ctc_raw_data/challenge/Cell-Data-P2/02_RES")
+
+# result_dir = Path("/home/MinaHossain/DMNet_Rina/Cell-Data-P2/HP_TRA")
+gt_dir = Path("/home/MinaHossain/EmbedTrack/ctc_raw_data/challenge/Cell-Data-P2/02_GT")
+
+# Call the function and save the output to a file
+with open(result_dir / "output_scores.txt", "w") as f:
+    tra_score, tra_errors = calc_tra_score(result_dir, gt_dir)
+    f.write(f"TRA Score: {tra_score}\n")
+    f.write(f"AOGM Errors: {tra_errors}\n\n")
+
+    # CTC scores
+    ctc_scores = calc_ctc_scores(result_dir, gt_dir)
+    f.write("CTC Scores:\n")
+    for metric, score in ctc_scores.items():
+        f.write(f"{metric}: {score}\n")
