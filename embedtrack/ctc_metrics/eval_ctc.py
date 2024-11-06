@@ -279,10 +279,11 @@ def extract_aogm_info(tra_log_file):
 
 
 
-result_dir = Path("/home/MinaHossain/EmbedTrack/ctc_raw_data/challenge/Cell-Data-P2/02_RES")
+result_dir = Path("/home/MinaHossain/EmbedTrack/ctc_raw_data/challenge/Cell-Data-P2/02_RES_T2")
+gt_dir = Path("/home/MinaHossain/EmbedTrack/ctc_raw_data/challenge/Cell-Data-P2/02_GT")
 
 # result_dir = Path("/home/MinaHossain/DMNet_Rina/Cell-Data-P2/HP_TRA")
-gt_dir = Path("/home/MinaHossain/EmbedTrack/ctc_raw_data/challenge/Cell-Data-P2/02_GT")
+# gt_dir = Path("/home/MinaHossain/DMNet_Rina/training_codes/Data/train/Cell-Data-P2-L2L/02_GT")
 
 # Call the function and save the output to a file
 with open(result_dir / "output_scores.txt", "w") as f:

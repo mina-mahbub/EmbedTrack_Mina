@@ -28,7 +28,8 @@ import tifffile
 import torch
 
 
-def inference(raw_data_path, model_path, config_file, batch_size=32):
+   
+def inference(raw_data_path, model_path, config_file, batch_size=16):  # batch_size=32
     """
     Segment and track a ctc dataset using a trained EmbedTrack model.
     Args:
@@ -108,8 +109,9 @@ def inference(raw_data_path, model_path, config_file, batch_size=32):
     )
     model = init_model(model_dict, project_config)
     # if torch.cuda.device_count() > 1:
-    #     model = torch.nn.DataParallel(model)
+        # model = torch.nn.DataParallel(model)
 
+    model = torch.nn.DataParallel(model)
     model = model.to(device)
     model.eval()
 

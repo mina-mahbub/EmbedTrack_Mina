@@ -66,8 +66,10 @@ class VisualizeTraining:
 
         self.patches = []
 
-        self.grid = calc_grid(grid_x, grid_y, pixel_x, pixel_y).cuda()
-        self.grid_shape = torch.tensor(self.grid.size()[1:]).view(-1, 1).cuda()
+        # self.grid = calc_grid(grid_x, grid_y, pixel_x, pixel_y).cuda()
+        # self.grid_shape = torch.tensor(self.grid.size()[1:]).view(-1, 1).cuda()
+        self.grid = calc_grid(grid_x, grid_y, pixel_x, pixel_y).to('cuda')
+        self.grid_shape = torch.tensor(self.grid.size()[1:]).view(-1, 1).to('cuda')
         self.n_sigma = n_sigma
         self.cluster = cluster
 

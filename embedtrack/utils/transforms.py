@@ -68,7 +68,7 @@ class ImageAugmentation:
         self.keys = keys
         self.transform = [
             albumentations.Blur(p=0.3),
-            Clahe(p=0.3),
+            # Clahe(p=0.3),
         ]
 
     def __call__(self, sample):

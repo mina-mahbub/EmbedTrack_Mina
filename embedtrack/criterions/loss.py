@@ -94,28 +94,57 @@ class EmbedTrackLoss(nn.Module):
 
         yxm_s = self.yxm[:, 0:height, 0:width]  # N x h x w if 2D images: N=2
 
-        loss = torch.tensor(0, device=device, dtype=torch.float)
-        track_loss = 0
-        track_count = 0
+        # loss = torch.tensor(0, device=device, dtype=torch.float)
+        # track_loss = 0
+        # track_count = 0
+        loss = torch.tensor(0.0, device=device)
+        track_loss = torch.tensor(0.0, device=device)  # Initialize as tensor
+        track_count = torch.tensor(0.0, device=device)  # Initialize as tensor
 
+        ##### Old version of loss initialization.
+        # loss_values = {    
+        #     "instance": 0,
+        #     "variance": 0,
+        #     "seed": 0,
+        #     "track": 0,
+        # }
+
+        ####### Initialize all loss-related variables (track_loss, seed_loss, etc.) as tensors. New code by ChatGPT.
         loss_values = {
-            "instance": 0,
-            "variance": 0,
-            "seed": 0,
-            "track": 0,
+            "instance": torch.tensor(0.0, device=device),
+            "variance": torch.tensor(0.0, device=device),
+            "seed": torch.tensor(0.0, device=device),
+            "track": torch.tensor(0.0, device=device),
         }
-        for b in range(0, batch_size):
+        # for b in range(0, batch_size):    ## Original code
+        #     seed_loss_it = 0
+        #     seed_loss_count = 0
+        #     segm_offsets = torch.tanh(segmentation_predictions[b, 0:2])
+        #     spatial_emb = segm_offsets + yxm_s
+        #     if b < batch_size // 2:
+        #         track_offsets = torch.tanh(offset_predictions[b, ...])
+        #         tracking_emb = yxm_s - track_offsets
+        #     # edited to be between 0...1 -> scaling with exp(K*x)
+        #     sigma = torch.sigmoid(
+        #         segmentation_predictions[b, 2 : 2 + self.n_sigma]
+        #     )  # n_sigma x h x w
+
+        for b in range(0, min(batch_size, offset_predictions.size(0))):         ### Chat-GPT updated code
             seed_loss_it = 0
             seed_loss_count = 0
             segm_offsets = torch.tanh(segmentation_predictions[b, 0:2])
             spatial_emb = segm_offsets + yxm_s
-            if b < batch_size // 2:
+
+            # Only access offset_predictions if b < half the batch size (tracking batch)
+            if b < offset_predictions.size(0):  # Use offset_predictions size
                 track_offsets = torch.tanh(offset_predictions[b, ...])
                 tracking_emb = yxm_s - track_offsets
-            # edited to be between 0...1 -> scaling with exp(K*x)
-            sigma = torch.sigmoid(
-                segmentation_predictions[b, 2 : 2 + self.n_sigma]
-            )  # n_sigma x h x w
+
+            # scaling with exp(K*x)
+            sigma = torch.sigmoid(segmentation_predictions[b, 2 : 2 + self.n_sigma])     ### Chat-GPT updated code
+
+    
+             # The rest of your code follows.....as Original
 
             seed_map = torch.sigmoid(
                 segmentation_predictions[b, 2 + self.n_sigma : 2 + self.n_sigma + 1]
@@ -257,6 +286,7 @@ class EmbedTrackLoss(nn.Module):
             track_loss /= track_count
         loss += track_loss
         loss = loss / (b + 1)
+        loss_values["track"] += track_loss.detach()   #### This line was added as per ChatGPT
 
         return loss + segmentation_predictions.sum() * 0, loss_values
 
@@ -310,3 +340,4 @@ def calc_iou_full_image(gt, prediction):
         num_non_matched = len(pred_labels)
     ious.extend([0] * num_non_matched)
     return ious
+

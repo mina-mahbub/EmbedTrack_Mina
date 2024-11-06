@@ -12,12 +12,13 @@ from embedtrack.train.run_training_pipeline import (
     TrainConfig,
     run_pipeline,
 )
+
 import os
 from pathlib import Path
 
 # data configs
 
-PROJECT_PATH = "/home/MinaHossain/EmbedTrack_Mina"
+PROJECT_PATH = "/home/MinaHossain/EmbedTrack"  # /home/MinaHossain/EmbedTrack
 
 RAW_DATA_PATH = os.path.join(PROJECT_PATH, "ctc_raw_data/train")
 DATA_PATH_DEST = os.path.join(PROJECT_PATH, "data")
@@ -25,25 +26,17 @@ MODEL_PATH = os.path.join(PROJECT_PATH, "models")
 
 USE_SILVER_TRUTH = True
 TRAIN_VAL_SEQUNCES = ["01"]
-TRAIN_VAL_SPLIT = 0.1
+TRAIN_VAL_SPLIT = 0.10
 
 
-DATA_SETS = [
-    # "Fluo-N2DH-SIM+",
-    # "Fluo-C2DL-MSC",
-    # "Fluo-N2DH-GOWT1",
-    # "PhC-C2DL-PSC",
-    # "BF-C2DL-HSC",
-    # "Fluo-N2DL-HeLa",
-    # "BF-C2DL-MuSC",
-    # "DIC-C2DH-HeLa",
-    # "PhC-C2DH-U373",
-    "Cell-Data-M"
-]
+DATA_SETS = [   "Cell-Data-P2" ]
+
+
+MODEL_NAME = "test4" # Change this everytime you make a brand new model
 
 N_EPOCHS = 15
 # Adam optimizer; normalize images; OneCycle LR sheduler; N epochs
-MODEL_NAME = "adam_norm_onecycle_" + str(N_EPOCHS)
+
 
 
 for data_set in DATA_SETS:
@@ -67,20 +60,21 @@ for data_set in DATA_SETS:
         data_set,
         MODEL_NAME,
     )
-    if data_set != "Fluo-C2DL-MSC":
-        CROP_SIZE = 256
-        TRAIN_BATCH_SIZE = 16
-        VAL_BATCH_SIZE = 16
+    if data_set == "Cell-Data-P2":
+        CROP_SIZE = 512
+        TRAIN_BATCH_SIZE = 8
+        VAL_BATCH_SIZE = 8
         DISPLAY_IT = 1000
 
     else:
         CROP_SIZE = 512
-        TRAIN_BATCH_SIZE = 8
-        VAL_BATCH_SIZE = 8
+        TRAIN_BATCH_SIZE = 4
+        VAL_BATCH_SIZE = 4
         DISPLAY_IT = 200
 
-    CENTER = "medoid"  # 'centroid', 'approximate-medoid', 'medoid'
-    RESUME_TRAINING = False
+    CENTER = "centroid"  # 'centroid', 'approximate-medoid', 'medoid'
+    ### we tried  "medoid" on test2 and test3
+    RESUME_TRAINING = True  # we changed it to TRUE from FALSE to resume the training from previous training. ############ Mina
     TRAIN_SIZE = None  # train on full train data set; otherwise still training on full data set but only use a fraction of the data per epoch
     VAL_SIZE = None  # train on full train data set; otherwise still training on full data set but only use a fraction of the data per epoch
     VIRTUAL_TRAIN_BATCH_MULTIPLIER = 1
@@ -101,6 +95,7 @@ for data_set in DATA_SETS:
         n_epochs=N_EPOCHS,
         display=DISPLAY,
         display_it=DISPLAY_IT,
+        learning_rate=5e-5
     )
 
     # model config
@@ -112,3 +107,4 @@ for data_set in DATA_SETS:
 
     run_pipeline(data_config, train_config, model_config)
     plt.close("all")
+

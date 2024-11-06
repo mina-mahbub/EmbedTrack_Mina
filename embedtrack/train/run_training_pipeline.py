@@ -17,6 +17,7 @@ from embedtrack.utils.create_dicts import (
     create_configs,
 )
 
+
 from embedtrack.datasets.generate_crops import *
 from embedtrack.datasets.prepare_data import prepare_ctc_data
 from embedtrack.datasets.prepare_data import prepare_ctc_gt
@@ -50,8 +51,8 @@ class DataConfig:
         data_set,
         data_path,
         use_silver_truth=False,
-        train_val_sequences=["01", "02"],
-        train_val_split=0.2,
+        train_val_sequences=["01"],   #####?01  ["01", "02"]
+        train_val_split=0.10, #####?
     ):
         """
         Configuration of the training and vaildation dataset
@@ -502,7 +503,7 @@ def init_training(data_config, train_config, model_config):
         batch_size=train_config.train_batch_size,
         virtual_batch_multiplier=train_config.virtual_train_batch_multiplier,
         type="train",
-        workers=8,
+        workers=48,
     )
 
     val_dataset_dict = create_dataset_dict(
@@ -515,7 +516,7 @@ def init_training(data_config, train_config, model_config):
         batch_size=train_config.val_batch_size,
         virtual_batch_multiplier=train_config.virtual_val_batch_multiplier,
         type="val",
-        workers=8,
+        workers=48,
     )
 
     n_classes = [*model_config.n_seg_classes, model_config.n_track_classes]
@@ -527,7 +528,8 @@ def init_training(data_config, train_config, model_config):
 
     if train_config.resume_training:
         resume_path = (
-            Path(train_config.save_model_path) / "best_iou_model.pth"
+            # Path(train_config.save_model_path) / "best_iou_model.pth"
+            Path(train_config.save_model_path) / "checkpoint.pth"
         ).as_posix()
 
         save_dir = train_config.save_model_path

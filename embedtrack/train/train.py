@@ -10,6 +10,8 @@ import torch
 import os
 
 
+# from EmbedTrack.embedtrack.criterions.loss import EmbedTrackLoss
+# from EmbedTrack.embedtrack.criterions.loss import EmbedTrackLoss
 from embedtrack.criterions.loss import EmbedTrackLoss
 from embedtrack.utils.utils import get_indices_pandas
 from embedtrack.models.net import TrackERFNet
@@ -95,6 +97,11 @@ def train_vanilla(
     pixel_y,
     n_sigma,
     args,
+    epoch,
+    best_iou,
+    logger,
+    save_dir,
+    starting_batch
 ):  # this is without virtual batches!
 
     # define meters
@@ -109,7 +116,20 @@ def train_vanilla(
     for param_group in optimizer.param_groups:
         print("learning rate: {}".format(param_group["lr"]))
     for i, sample in enumerate(tqdm(train_dataset_it)):
-
+        # Skip through batches until starting batch is None
+        # line 121-132 should be commented out , if want to save the training after every epochs.
+        if starting_batch > 0:
+            starting_batch -= 1
+            continue
+        if i % 10 == 0:
+            state = {
+                "epoch": epoch,
+                "best_iou": best_iou,
+                "model_state_dict": model.state_dict(),
+                "optim_state_dict": optimizer.state_dict(),
+                "logger_data": logger.data,
+            }
+            save_checkpoint(state, False, epoch, save_dir, i)
         curr_frames = sample["image_curr"]  # curr frames
         prev_frames = sample["image_prev"]  # prev frames
         offset = sample["flow"].squeeze(1).to(device)  # 1YX
@@ -138,18 +158,6 @@ def train_vanilla(
         loss_meter.update(loss.item())
         for key in loss_parts_meter.keys():
             loss_parts_meter[key].update(loss_parts[key].mean().item())
-        # visualize data
-        if display_it is not None:
-            if i % display_it == 0 and i != 0:
-                prediction = (output[0][0], output[1][0])
-                ground_truth = (
-                    instances[0].to(device),
-                    center_images[0].to(device),
-                    offset[0].to(device),
-                )
-                prev_instance = instances[len(instances) // 2].to(device)
-                image_pair = (sample["image_curr"][0], sample["image_prev"][0])
-                visualize_training(prediction, ground_truth, prev_instance, image_pair)
 
     loss_part_avg = {key: meter.avg for key, meter in loss_parts_meter.items()}
     return loss_meter.avg, loss_part_avg
@@ -258,10 +266,14 @@ def val_vanilla(
     return loss_meter.avg, iou_meter.avg, loss_part_avg
 
 
-def save_checkpoint(state, is_best, epoch, save_dir, name="checkpoint.pth"):
-    print("=> saving checkpoint")
+def save_checkpoint(state, is_best, epoch, save_dir, batch=None, name="checkpoint.pth"):
+    # print("=> saving checkpoint")
     file_name = os.path.join(save_dir, name)
     torch.save(state, file_name)
+    # Keeps track of batch number while training and saving early
+    if batch is not None:
+        with open(os.path.join(save_dir, "batch_counter.txt"), "w") as handle:
+            handle.write(str(batch))
     if epoch % 10 == 0:
         file_name2 = os.path.join(save_dir, str(epoch) + "_" + name)
         torch.save(state, file_name2)
@@ -368,10 +380,16 @@ def begin_training(
     # resume
     start_epoch = 0
     best_iou = 0
+    starting_batch = 0
     if configs["resume_path"] is not None and os.path.exists(configs["resume_path"]):
         print("Resuming model from {}".format(configs["resume_path"]))
+        if os.path.exists(os.path.join(configs["save_dir"], "batch_counter.txt")):
+            with open(os.path.join(configs["save_dir"], "batch_counter.txt")) as handle:
+                starting_batch = int(handle.readline())
+
         state = torch.load(configs["resume_path"])
-        start_epoch = state["epoch"] + 1
+        # start_epoch = state["epoch"] + 1
+        start_epoch = state["epoch"]  # Account for unfinished epochs
         best_iou = state["best_iou"]
         model.load_state_dict(state["model_state_dict"], strict=True)
         optimizer.load_state_dict(state["optim_state_dict"])
@@ -396,6 +414,11 @@ def begin_training(
                 pixel_x=configs["pixel_x"],
                 pixel_y=configs["pixel_y"],
                 args=loss_dict["lossW"],
+                epoch=epoch,
+                save_dir=configs["save_dir"],
+                best_iou=best_iou,
+                logger=logger,
+                starting_batch=starting_batch
             )
 
         if val_dataset_dict["virtual_batch_multiplier"] > 1:
@@ -458,3 +481,4 @@ def begin_training(
                 "logger_data": logger.data,
             }
         save_checkpoint(state, is_best, epoch, save_dir=configs["save_dir"])
+

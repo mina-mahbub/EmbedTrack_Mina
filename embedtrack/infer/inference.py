@@ -18,8 +18,8 @@ from embedtrack.utils.utils import get_indices_pandas
 from pathlib import Path
 
 
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = 'cuda:0'
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = 'cuda:0'
 
 
 class InferenceDataSet(Dataset):
