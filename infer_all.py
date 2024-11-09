@@ -91,12 +91,10 @@ RAW_DATA_PATHS = [os.path.join(PROJECT_PATH, "ctc_raw_data/challenge")]
 MODEL_PATH = os.path.join(PROJECT_PATH, "models")
 # RES_PATH = os.path.join(PROJECT_PATH, "results")
 
-DATA_SETS = [
-    "Cell-Data-P2",
-]
+DATA_SETS = [ "Cell-Data-P2"]
 
 CALC_CTC_METRICS = False
-MODEL_NAME = "test3"
+MODEL_NAME = "test2"
 BATCH_SIZE = 16
 runtimes = {}
 
