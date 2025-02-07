@@ -94,8 +94,9 @@ MODEL_PATH = os.path.join(PROJECT_PATH, "models")
 DATA_SETS = [ "Cell-Data-P2"]
 
 CALC_CTC_METRICS = False
-MODEL_NAME = "test2"
-BATCH_SIZE = 16
+
+MODEL_NAME = "test5"    ### ### Change the name every time we run inferernce for a model that was trained #### 
+BATCH_SIZE = 8
 runtimes = {}
 
 for raw_data_path in RAW_DATA_PATHS:
@@ -140,3 +141,5 @@ for raw_data_path in RAW_DATA_PATHS:
 
             run_time = t_end - t_start
             print(f"Inference Time {img_path}: {run_time}s")
+
+

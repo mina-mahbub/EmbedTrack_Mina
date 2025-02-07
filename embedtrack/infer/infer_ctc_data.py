@@ -130,8 +130,8 @@ def inference(raw_data_path, model_path, config_file, batch_size=16):  # batch_s
         model_dict,
         project_config,
         cluster,
-        min_mask_size=train_config["train_dict"]["min_mask_size"] * 0.5,
-    )
+        min_mask_size=train_config["train_dict"]["min_mask_size"] * 0.5, 
+          )
     foi_correction(tracking_dir, data_set)
     fill_empty_frames(tracking_dir)
     lineage = pd.read_csv(
@@ -158,9 +158,8 @@ def fill_empty_frames(mask_dir):
     Returns: the modified tracks
 
     """
-    time_steps = [
-        (time_idx, file) for time_idx, file in get_img_files(Path(mask_dir)).items()
-    ]
+    time_steps = [ (time_idx, file) for time_idx, file in get_img_files(Path(mask_dir)).items() ]
+
     time_steps.sort(key=lambda x: x[0])
     filled_time_steps = []
     empty_time_steps = []
@@ -200,9 +199,7 @@ def fill_empty_frames(mask_dir):
             )
 
     lineage = lineage.reset_index().sort_values("cell_id")
-    lineage.to_csv(
-        os.path.join(mask_dir, "res_track.txt"), sep=" ", index=False, header=False
-    )
+    lineage.to_csv( os.path.join(mask_dir, "res_track.txt"), sep=" ", index=False, header=False )
 
 
 if __name__ == "__main__":

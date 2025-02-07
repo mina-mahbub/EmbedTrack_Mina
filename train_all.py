@@ -29,10 +29,10 @@ TRAIN_VAL_SEQUNCES = ["01"]
 TRAIN_VAL_SPLIT = 0.10
 
 
-DATA_SETS = [   "Cell-Data-P2" ]
+DATA_SETS = [ "Cell-Data-P2" ]
 
 
-MODEL_NAME = "test4" # Change this everytime you make a brand new model
+MODEL_NAME = "test6" # Change this everytime you make a brand new model
 
 N_EPOCHS = 15
 # Adam optimizer; normalize images; OneCycle LR sheduler; N epochs
@@ -68,11 +68,11 @@ for data_set in DATA_SETS:
 
     else:
         CROP_SIZE = 512
-        TRAIN_BATCH_SIZE = 4
-        VAL_BATCH_SIZE = 4
+        TRAIN_BATCH_SIZE = 8
+        VAL_BATCH_SIZE = 8
         DISPLAY_IT = 200
 
-    CENTER = "centroid"  # 'centroid', 'approximate-medoid', 'medoid'
+    CENTER = "medoid"  # 'centroid', 'approximate-medoid', 'medoid'
     ### we tried  "medoid" on test2 and test3
     RESUME_TRAINING = True  # we changed it to TRUE from FALSE to resume the training from previous training. ############ Mina
     TRAIN_SIZE = None  # train on full train data set; otherwise still training on full data set but only use a fraction of the data per epoch
@@ -95,7 +95,7 @@ for data_set in DATA_SETS:
         n_epochs=N_EPOCHS,
         display=DISPLAY,
         display_it=DISPLAY_IT,
-        learning_rate=5e-5
+        learning_rate=5e-6
     )
 
     # model config
