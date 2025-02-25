@@ -28,6 +28,7 @@ import tifffile
 import torch
 
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
    
 def inference(raw_data_path, model_path, config_file, batch_size=16):  # batch_size=32
     """

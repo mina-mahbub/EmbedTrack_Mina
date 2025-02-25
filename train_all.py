@@ -32,7 +32,7 @@ TRAIN_VAL_SPLIT = 0.10
 DATA_SETS = [ "Cell-Data-P2" ]
 
 
-MODEL_NAME = "test6" # Change this everytime you make a brand new model
+MODEL_NAME = "test7" # Change this everytime you make a brand new model
 
 N_EPOCHS = 15
 # Adam optimizer; normalize images; OneCycle LR sheduler; N epochs
@@ -95,7 +95,7 @@ for data_set in DATA_SETS:
         n_epochs=N_EPOCHS,
         display=DISPLAY,
         display_it=DISPLAY_IT,
-        learning_rate=5e-6
+        learning_rate=5e-8
     )
 
     # model config
