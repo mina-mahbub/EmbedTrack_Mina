@@ -62,14 +62,14 @@ for data_set in DATA_SETS:
     )
     if data_set == "Cell-Data-P2":
         CROP_SIZE = 512
-        TRAIN_BATCH_SIZE = 8
-        VAL_BATCH_SIZE = 8
+        TRAIN_BATCH_SIZE = 6 ## 8 ## 16
+        VAL_BATCH_SIZE = 6
         DISPLAY_IT = 1000
 
     else:
         CROP_SIZE = 512
-        TRAIN_BATCH_SIZE = 8
-        VAL_BATCH_SIZE = 8
+        TRAIN_BATCH_SIZE = 6
+        VAL_BATCH_SIZE = 6
         DISPLAY_IT = 200
 
     CENTER = "medoid"  # 'centroid', 'approximate-medoid', 'medoid'
@@ -95,7 +95,7 @@ for data_set in DATA_SETS:
         n_epochs=N_EPOCHS,
         display=DISPLAY,
         display_it=DISPLAY_IT,
-        learning_rate=5e-8
+        learning_rate=5e-4
     )
 
     # model config
