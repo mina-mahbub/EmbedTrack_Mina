@@ -19,16 +19,16 @@ from itertools import product
 parser = argparse.ArgumentParser(description="Run FNN regression with grid search and analysis.")
 parser.add_argument("--csv_path", type=str, required=True, help="Path to input CSV file")
 parser.add_argument("--epochs", type=int, default=100, help="Number of training epochs")
+parser.add_argument("--resume_from", type=str, default=None, help="Path to saved model (.pt) to resume training")
+parser.add_argument("--resume_training", action="store_true", help="Flag to continue training from saved model")
 args = parser.parse_args()
 
 # Set device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"\n🖥 Using device: {device}\n")
 
-# Create timestamped output directory
-# timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-# output_root = f"./Reg_Analysis_{timestamp}"
-output_root=f"/home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Reg_Analysis/"
+# Output root path
+output_root = "/home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Mean/Reg_Analysis"
 os.makedirs(f"{output_root}/models", exist_ok=True)
 os.makedirs(f"{output_root}/results", exist_ok=True)
 os.makedirs(f"{output_root}/plots", exist_ok=True)
@@ -59,9 +59,9 @@ def evaluate_model(model, X_test_tensor, y_test_tensor):
     mse = mean_squared_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
 
-    print("\n\U0001F4CA Model Evaluation on Test Data:")
-    print(f"✅ Test Mean Squared Error (MSE): {mse:.4f}")
-    print(f"✅ Test R-squared (R²): {r2:.4f}")
+    print("\n📊 Model Evaluation on Test Data:")
+    print(f"✅ Test MSE: {mse:.4f}")
+    print(f"✅ Test R²: {r2:.4f}")
 
     return mse, r2, y_true, y_pred
 
@@ -140,7 +140,9 @@ def plot_results(y_true, y_pred, train_losses=None):
 
 
 def run_fnn_pytorch(csv_path, epochs=100, batch_size=16, lr=0.001,
-                    hidden_sizes=(128, 64, 32), save_model=False, model_save_path="fnn_model.pth"):
+                    hidden_sizes=(128, 64, 32), save_model=False,
+                    model_save_path="fnn_model.pth",
+                    load_model_path=None, resume_training=False):
     df = pd.read_csv(csv_path)
     print(f"\n🔍 Running PyTorch FNN Regression on FULL dataset (All Cells)")
 
@@ -149,7 +151,6 @@ def run_fnn_pytorch(csv_path, epochs=100, batch_size=16, lr=0.001,
     target = "X_Centroid_Velocity_MA"
 
     df = df.dropna(subset=features + [target])
-
     X = df[features].values.astype(np.float32)
     y = df[target].values.astype(np.float32).reshape(-1, 1)
 
@@ -167,6 +168,10 @@ def run_fnn_pytorch(csv_path, epochs=100, batch_size=16, lr=0.001,
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 
     model = FNN(input_size=X.shape[1], hidden_sizes=hidden_sizes).to(device)
+    if resume_training and load_model_path and os.path.isfile(load_model_path):
+        model.load_state_dict(torch.load(load_model_path, map_location=device))
+        print(f"🔄 Loaded model weights from: {load_model_path}")
+
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
@@ -193,104 +198,36 @@ def run_fnn_pytorch(csv_path, epochs=100, batch_size=16, lr=0.001,
     return model, train_losses, X_test_tensor, y_test_tensor
 
 
-def grid_search_fnn(csv_path, param_grid, save_best_model=True, output_results_csv=f"{output_root}/results/grid_search_results.csv"):
-    results = []
-    best_r2 = -float("inf")
-    best_config = None
-    best_model = None
-    best_train_losses = None
-    best_X_test_tensor = None
-    best_y_test_tensor = None
-
-    all_combinations = list(product(param_grid["lr"], param_grid["batch_size"], param_grid["hidden_sizes"], param_grid["epochs"]))
-
-    for i, (lr, batch_size, hidden_sizes, epochs) in enumerate(all_combinations, 1):
-        print(f"\n🔍 [{i}/{len(all_combinations)}] Config: lr={lr}, batch_size={batch_size}, hidden_sizes={hidden_sizes}, epochs={epochs}")
-
-        model, train_losses, X_test_tensor, y_test_tensor = run_fnn_pytorch(
-            csv_path=csv_path,
-            epochs=epochs,
-            batch_size=batch_size,
-            lr=lr,
-            hidden_sizes=hidden_sizes,
-            save_model=False
-        )
-
-        mse, r2, y_true, y_pred = evaluate_model(model, X_test_tensor, y_test_tensor)
-
-        results.append({
-            "lr": lr,
-            "batch_size": batch_size,
-            "hidden_sizes": str(hidden_sizes),
-            "epochs": epochs,
-            "mse": round(mse, 4),
-            "r2": round(r2, 4)
-        })
-
-        if r2 > best_r2:
-            best_r2 = r2
-            best_config = {
-                "lr": lr,
-                "batch_size": batch_size,
-                "hidden_sizes": hidden_sizes,
-                "epochs": epochs,
-                "model_name": f"fnn_lr{lr}_bs{batch_size}_ep{epochs}_hl{'x'.join(map(str, hidden_sizes))}.pt"
-            }
-            best_model = model
-            best_train_losses = train_losses
-            best_X_test_tensor = X_test_tensor
-            best_y_test_tensor = y_test_tensor
-
-    if save_best_model and best_model is not None:
-        model_save_path = f"{output_root}/models/{best_config['model_name']}"
-        torch.save(best_model.state_dict(), model_save_path)
-        print(f"💾 Best model saved as: {model_save_path}")
-
-    results_df = pd.DataFrame(results)
-    results_df.to_csv(output_results_csv, index=False)
-    print(f"\n✅ Grid Search Summary saved to: {output_results_csv}")
-    print(f"🏆 Best R² = {best_r2:.4f} | Best Config = {best_config}")
-
-    return best_model, best_config, results_df, best_train_losses, best_X_test_tensor, best_y_test_tensor
-
+# ===== Run Script =====
 
 if __name__ == "__main__":
-    # param_grid = {
-    #     "lr": [0.001, 0.0005],
-    #     "batch_size": [16, 32],
-    #     "hidden_sizes": [(128, 64, 32), (128, 128), (64, 32)],
-    #     "epochs": [100, 200, 300, 400, 500]
-    # }
-
-    param_grid = {
-    "lr": [0.001, 0.0001,0.0005,0.00001,0.00005,0.000001],
-    "batch_size": [8, 12, 16, 24, 32],
-    "hidden_sizes": [(1024,512,256,128, 64, 32,16,8),(512,256,128, 64, 32,16,8),(256,128, 64, 32,16,8),(128, 64, 32,16,8), (64, 32,16,8), (32,16,8),(16,8),
-                     (256,128,128, 64, 64,16,8), (512,256,256, 128, 32,32,8),(256,128,64, 64, 32,8,8),(256,128,128, 64, 64,32,8),(64, 32,32,16,8),(32, 32,16,8)],
-    "epochs": [100,200,300,400,500]
-                }
-
-    best_model, best_config, results_df, best_train_losses, best_X_test_tensor, best_y_test_tensor = grid_search_fnn(
+    # Customize training here
+    model, train_losses, X_test_tensor, y_test_tensor = run_fnn_pytorch(
         csv_path=args.csv_path,
-        param_grid=param_grid,
-        save_best_model=True
+        epochs=args.epochs,
+        batch_size=8,
+        lr=0.00001,
+        hidden_sizes=(128, 64, 32, 16, 8),
+        save_model=True,
+        model_save_path=f"{output_root}/models/fnn_resumed_ep{args.epochs}_lr0.0005_bs12_hl128x64x32x16x8.pt",
+        load_model_path=args.resume_from,
+        resume_training=args.resume_training
     )
 
-    mse, r2, y_true, y_pred = evaluate_model(best_model, best_X_test_tensor, best_y_test_tensor)
-    plot_results(y_true, y_pred, train_losses=best_train_losses)
+    mse, r2, y_true, y_pred = evaluate_model(model, X_test_tensor, y_test_tensor)
+    plot_results(y_true, y_pred, train_losses=train_losses)
 
-    print("\n🏆 Best Model Details:")
-    print(best_config)
-
-    if best_model:
-        print("\n🧠 Model Architecture:")
-        print(best_model)
-        print(f"\n💾 Best model is saved as: {output_root}/models/{best_config['model_name']}")
-    else:
-        print("❌ No best model was found.")
+    print("\n📌 Final Model Configuration:")
+    print(f"LR: 0.0005 | Batch Size: 12 | Hidden: (128, 64, 32, 16, 8) | Epochs: {args.epochs}")
+    print(f"Model saved at: {output_root}/models/fnn_resumed_ep{args.epochs}_lr0.0005_bs12_hl128x64x32x16x8.pt")
 
 
+# CUDA_VISIBLE_DEVICES=0 python FNN_Mean.py \
+# --csv_path /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Mean/Cells_Centroid_Velocity_TrueLabel_MA_Mean_5.csv \
+# --epochs 100 \
+# --resume_from /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Mean/Reg_Analysis/models/fnn_lr0.0005_bs12_ep400_hl128x64x32x16x8.pt \
+# --resume_training
 
-# python3 fnn_regression_pipeline.py --csv_path /path/to/your/data.csv --epochs 300   # For a particular number of epochs. 
-# python FNN_Mean.py --csv_path /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Mean/Cells_Centroid_Velocity_TrueLabel_MA_Mean_5.csv 
-# CUDA_VISIBLE_DEVICES=0  python  FNN_Median.py --csv_path /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Cells_Centroid_Velocity_TrueLabel_MA_Median_5.csv 
+
+# CUDA_VISIBLE_DEVICES=1  python FNN_Mean_ReTr.py --csv_path /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Mean/Cells_Centroid_Velocity_TrueLabel_MA_Mean_5.csv --epochs 500 --resume_from /home/MinaH
+# ossain/EmbedTrack/Track_New_Result_Shape/Mean/Reg_Analysis/models/fnn_lr0.0005_bs12_ep400_hl128x64x32x16x8.pt --resume_training
