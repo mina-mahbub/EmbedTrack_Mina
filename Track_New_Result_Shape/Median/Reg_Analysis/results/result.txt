@@ -1,0 +1,32 @@
+✅ Grid Search Summary saved to: /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Reg_Analysis//results/grid_search_results.csv
+🏆 Best R² = 0.1417 | Best Config = {'lr': 0.001, 'batch_size': 24, 'hidden_sizes': (512, 256, 128, 64, 32, 16, 8), 'epochs': 400, 'model_name': 'fnn_lr0.001_bs24_ep400_hl512x256x128x64x32x16x8.pt'}
+
+📊 Model Evaluation on Test Data:
+✅ Test Mean Squared Error (MSE): 36.8517
+✅ Test R-squared (R²): 0.1417
+
+🏆 Best Model Details:
+{'lr': 0.001, 'batch_size': 24, 'hidden_sizes': (512, 256, 128, 64, 32, 16, 8), 'epochs': 400, 'model_name': 'fnn_lr0.001_bs24_ep400_hl512x256x128x64x32x16x8.pt'}
+
+🧠 Model Architecture:
+FNN(
+  (model): Sequential(
+    (0): Linear(in_features=8, out_features=512, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ReLU()
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ReLU()
+    (6): Linear(in_features=128, out_features=64, bias=True)
+    (7): ReLU()
+    (8): Linear(in_features=64, out_features=32, bias=True)
+    (9): ReLU()
+    (10): Linear(in_features=32, out_features=16, bias=True)
+    (11): ReLU()
+    (12): Linear(in_features=16, out_features=8, bias=True)
+    (13): ReLU()
+    (14): Linear(in_features=8, out_features=1, bias=True)
+  )
+)
+
+💾 Best model is saved as: /home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Reg_Analysis//models/fnn_lr0.001_bs24_ep400_hl512x256x128x64x32x16x8.pt
