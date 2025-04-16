@@ -1,0 +1,7 @@
+Model,Best_Params
+Ridge_Tuned,{'alpha': 1000.0}
+Lasso_Tuned,"{'max_iter': 10000, 'alpha': 1.629750834620645}"
+ElasticNet_Tuned,"{'max_iter': 10000, 'l1_ratio': 0.6052631578947368, 'alpha': 0.23101297000831605}"
+RandomForest_Tuned,"{'n_estimators': 300, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': 10}"
+XGBoost_Tuned,"{'subsample': 0.7, 'n_estimators': 300, 'max_depth': 10, 'learning_rate': 0.01, 'colsample_bytree': 0.9}"
+LinearRegression_Tuned,No tuning required
