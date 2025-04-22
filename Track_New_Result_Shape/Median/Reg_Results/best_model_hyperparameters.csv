@@ -1,7 +1,7 @@
 Model,Best_Params
-Ridge_Tuned,{'alpha': 572.236765935022}
-Lasso_Tuned,"{'max_iter': 10000, 'alpha': 0.1747528400007685}"
-ElasticNet_Tuned,"{'max_iter': 10000, 'l1_ratio': 0.26842105263157895, 'alpha': 0.8111308307896873}"
-RandomForest_Tuned,"{'n_estimators': 100, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': None, 'max_depth': 5}"
-XGBoost_Tuned,"{'subsample': 0.9, 'n_estimators': 100, 'max_depth': 10, 'learning_rate': 0.01, 'colsample_bytree': 0.9}"
+Ridge_Tuned,{'alpha': 1000.0}
+Lasso_Tuned,"{'max_iter': 10000, 'alpha': 0.11497569953977356}"
+ElasticNet_Tuned,"{'max_iter': 10000, 'l1_ratio': 0.5631578947368421, 'alpha': 0.08697490026177834}"
+RandomForest_Tuned,"{'n_estimators': 100, 'min_samples_split': 2, 'min_samples_leaf': 5, 'max_features': 'sqrt', 'max_depth': 10}"
+XGBoost_Tuned,"{'subsample': 0.5, 'n_estimators': 200, 'max_depth': 10, 'learning_rate': 0.001, 'colsample_bytree': 1.0}"
 LinearRegression_Tuned,No tuning required

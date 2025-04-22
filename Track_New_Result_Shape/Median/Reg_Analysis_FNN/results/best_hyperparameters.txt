@@ -1,0 +1,6 @@
+hidden_sizes: (256, 128, 64)
+lr: 0.0002012719159887882
+dropout: 0.35287893197229386
+weight_decay: 8.97569527528788e-05
+batch_size: 8
+epochs: 300
