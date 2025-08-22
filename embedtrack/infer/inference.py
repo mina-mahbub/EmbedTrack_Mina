@@ -611,8 +611,8 @@ def infer_sequence(model, data_config, model_config, config, cluster, min_mask_s
         int(re.findall(r"\d+", file)[0]): os.path.join(config["image_dir"], file)
         for file in os.listdir(config["image_dir"])
     }
-    time_points = sorted(img_files.keys(), reverse=True)  ####### old code.
-    # time_points = sorted(img_files.keys(), reverse= False)                  ### updated from Chat-GPT.
+    time_points = sorted(img_files.keys(), reverse=True)  ########################################################### old code.
+    # time_points = sorted(img_files.keys(), reverse= False)                  ######################################### updated from Chat-GPT.
 
     lineage = dict()
     max_tracking_id = 1
@@ -1183,4 +1183,5 @@ def find_tracklets(data_path, lineage_name="res_track.txt"):
 
 
 
-#### line 615
+###################################### line 615
+###################################### Change the order of the tracking frame ; forward /backward(built-in)

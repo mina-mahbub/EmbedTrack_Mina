@@ -91,7 +91,7 @@ from sklearn.model_selection import train_test_split
 
 
 # --- CONFIG ---
-output_root = "/home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Reg_Analysis_FNN_PCA2"  ## Change it
+output_root = "/home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Reg_Analysis_FNN_PCA"  ## Change it
 os.makedirs(f"{output_root}/models", exist_ok=True)
 os.makedirs(f"{output_root}/results", exist_ok=True)
 os.makedirs(f"{output_root}/plots", exist_ok=True)
@@ -183,7 +183,8 @@ def run_fnn(X_train, X_val, X_test, y_train, y_val, y_test, input_size, hidden_s
 # --- Grid Search ---
 def grid_search_fnn(csv_path, param_grid):
     df = pd.read_csv(csv_path)
-    shape_features = ['Area_MA', 'Perimeter_MA', 'Extent_MA', 'Solidity_MA', 'Compactness_MA', 'Elongation_MA', 'Circularity_MA']
+    # shape_features = ['Area_MA', 'Perimeter_MA', 'Extent_MA', 'Solidity_MA', 'Compactness_MA', 'Elongation_MA', 'Circularity_MA']
+    shape_features = ['Extent_MA',  'Solidity_MA', 'Compactness_MA', 'Elongation_MA','Perimeter_MA', 'Circularity_MA']
     target = 'X_Centroid_Velocity_MA'
     df = df.dropna(subset=shape_features + [target])
 
@@ -250,11 +251,12 @@ def grid_search_fnn(csv_path, param_grid):
 # --- Entry Point ---
 if __name__ == "__main__":
     param_grid = {
-        "lr": [0.01,0.001,0.0001,0.005,0.0005,0.00001],
-        "batch_size": [8,12, 16,24,32],
+        "lr": [0.001,0.0001,0.005,0.0005,0.00001],
+        "batch_size": [8,16,24,32],
         "hidden_sizes": [(1024,512,256),(512,256,128),(256,128,64),(128, 64, 32), (64, 32, 16),(32,16,8),(64,32,16,8), (128, 64,32,16), (256,128,64,32),(1024,512,256,128),
                          (512,256,128, 64, 32), (256,128, 64, 32, 16),(1024,512,256,128,64),(1024,512,256,128,64,32,16),(512,256,128,64,32,16,8),(128,256,512,256,128,64,32),
-                         (128,256,512,512,256,128,32),(32,64,182,256,128,64,32),(64,128,256,512,256,128,64,32),(64,128,256,512,512,256,128,64,32)],
+                         (128,256,512,512,256,128,32),(32,64,182,256,128,64,32),(64,128,256,512,256,128,64,32),(64,128,256,512,512,256,128,64,32),
+                         (16,32,64,128,256,256,128,64,32,8),(8,16,32,64,128,256,256,128,64,32,8), (16,32,64,128,256,512,256,128,64,32,16)],
         "epochs": [100, 150,200,300]
     }
     csv_path = "/home/MinaHossain/EmbedTrack/Track_New_Result_Shape/Median/Cells_Centroid_Velocity_TrueLabel_MA_Median_5.csv"

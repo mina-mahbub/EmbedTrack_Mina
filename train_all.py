@@ -32,9 +32,9 @@ TRAIN_VAL_SPLIT = 0.10
 DATA_SETS = [ "Cell-Data-P2" ]
 
 
-MODEL_NAME = "test10" # Change this everytime you make a brand new model
+MODEL_NAME = "test12" # Change this everytime you make a brand new model
 
-N_EPOCHS = 15
+N_EPOCHS = 25
 # Adam optimizer; normalize images; OneCycle LR sheduler; N epochs
 
 
@@ -62,14 +62,14 @@ for data_set in DATA_SETS:
     )
     if data_set == "Cell-Data-P2":
         CROP_SIZE = 512
-        TRAIN_BATCH_SIZE = 4  ## 6 ## 8 ## 16
-        VAL_BATCH_SIZE = 4
+        TRAIN_BATCH_SIZE = 8  ## 6 ## 8 ## 16
+        VAL_BATCH_SIZE = 8
         DISPLAY_IT = 1000
 
     else:
         CROP_SIZE = 512
-        TRAIN_BATCH_SIZE = 4
-        VAL_BATCH_SIZE = 4
+        TRAIN_BATCH_SIZE = 8
+        VAL_BATCH_SIZE = 8
         DISPLAY_IT = 200
 
     CENTER = "medoid"  # 'centroid', 'approximate-medoid', 'medoid'
@@ -95,7 +95,7 @@ for data_set in DATA_SETS:
         n_epochs=N_EPOCHS,
         display=DISPLAY,
         display_it=DISPLAY_IT,
-        learning_rate=5e-6
+        learning_rate=5e-8
     )
 
     # model config
