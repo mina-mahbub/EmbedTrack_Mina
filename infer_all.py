@@ -95,7 +95,7 @@ DATA_SETS = [ "Cell-Data-P2"]
 
 CALC_CTC_METRICS = False
 
-MODEL_NAME = "test6"    ### ### Change the name every time we run inferernce for a model that was trained #### 
+MODEL_NAME = "test12"    ### ### Change the name every time we run inferernce for a model that was trained #### 
 BATCH_SIZE = 8 # 8
 runtimes = {}
 
