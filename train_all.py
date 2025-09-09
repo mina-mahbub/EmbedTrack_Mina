@@ -95,7 +95,7 @@ for data_set in DATA_SETS:
         n_epochs=N_EPOCHS,
         display=DISPLAY,
         display_it=DISPLAY_IT,
-        learning_rate=5e-8
+        learning_rate=5e-6
     )
 
     # model config
